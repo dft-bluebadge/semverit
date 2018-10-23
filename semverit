@@ -22,29 +22,33 @@ incrementPatch(){
   printf "%s.%s.%s" "$MAJOR" "$MINOR" "$((PATCH+1))"
 }
 
-hasBreakingChanges(){
-  DIR="$1"
-  VERSION="$2"
+hasChange(){
+  TYPE="$1"
+  DIR="$2"
+  VERSION="$3"
   cd "$DIR" || return
-  if git log --oneline "$VERSION..HEAD" | grep -q "^[a-z0-9]*\\sbreak/"; then
+  if git log --oneline "$VERSION..HEAD" | grep -q "^[a-z0-9]*\\s$TYPE/"; then
+    return 0
+  fi
+  return 1
+}
+
+hasBreakingChanges(){
+  if hasChange "break" "$1" "$2"; then
     return 0
   fi
   return 1
 }
 
 hasFeatureChanges(){
-  VERSION="$2"
-  cd "$DIR" || return
-  if git log --oneline "$VERSION..HEAD" | grep -q "^[a-z0-9]*\\sfeature/"; then
+  if hasChange "feature" "$1" "$2"; then
     return 0
   fi
   return 1
 }
 
 hasPatchChanges(){
-  VERSION="$2"
-  cd "$DIR" || return
-  if git log --oneline "$VERSION..HEAD" | grep -q "^[a-z0-9]*\\sbugfix/"; then
+  if hasChange "bugfix" "$1" "$2"; then
     return 0
   fi
   return 1
