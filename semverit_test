@@ -66,7 +66,7 @@ testHasBreakingChanges(){
    
   DIR=$(pwd)
   hasBreakingChanges "$DIR"
-  assertTrue $(hasBreakingChanges "$DIR")
+  assertTrue "" "$(hasBreakingChanges "$DIR")"
 }
 
 # testGetLastVersion(){
