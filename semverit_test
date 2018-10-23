@@ -124,7 +124,18 @@ testIncrementPatchWithBugfix(){
 }
 
 testFeatureWithPathIncrementsMinorAndResetsPatch(){
-  echo "TODO"  
+  EXISTING_VERSIONS="3.1.0"
+  EXPECTED_VERSION="3.2.0"
+  cd $(mktemp -d)
+  DIR=$(pwd)
+
+  generate_base_project
+  generate_feature_change "$DIR"
+  tag "$DIR" "$EXISTING_VERSIONS"
+  generate_feature_change "$DIR"
+  generate_patch_change "$DIR"
+  
+  assertEquals "$EXPECTED_VERSION" "$(getNextVersion $DIR)"
 }
 
 testIncrementMajor(){

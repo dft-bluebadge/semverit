@@ -69,14 +69,17 @@ getNextVersion() {
   else
     if hasBreakingChanges "$DIR" "$(getLastVersion "$DIR")"; then
       incrementMajor "$VERSION"
+      exit 0
     fi
 
     if hasFeatureChanges "$DIR"  "$(getLastVersion "$DIR")"; then
       incrementMinor "$VERSION"
+      exit 0
     fi
 
     if hasPatchChanges "$DIR"  "$(getLastVersion "$DIR")"; then
       incrementPatch "$VERSION"
+      exit 0
     fi
 
   fi
