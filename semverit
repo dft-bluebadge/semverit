@@ -9,7 +9,7 @@ incrementMajor(){
 hasBreakingChanges(){
   DIR="$1"
   cd "$DIR" || return
-  if git log | grep -q "break/"; then
+  if git log --oneline | grep -q "^[a-z0-9]*\\sbreak/"; then
     return 0
   fi
   return 1
