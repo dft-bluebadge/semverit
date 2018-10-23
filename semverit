@@ -10,10 +10,9 @@ hasBreakingChanges(){
   DIR="$1"
   cd "$DIR" || return
   if git log | grep -q "break/"; then
-    echo 0
-  else
-    echo 1
+    return 0
   fi
+  return 1
 }
 
 getLastVersion(){
@@ -29,7 +28,6 @@ getLatestVersion() {
     echo "0.1.0"
   else
     if hasBreakingChanges "$DIR"; then
-      echo "YEP!!"
       incrementMajor "$VERSION"
     else
       echo "$VERSION"

@@ -2,11 +2,11 @@
 # file: semverit_test.sh
 
 generate_base_project(){
-  git init
+  git init > /dev/null
   echo "change" >> README.md
-  git init
-  git add README.md
-  git commit -m "first commit"
+  git init > /dev/null
+  git add README.md > /dev/null
+  git commit -m "first commit" > /dev/null
 }
 
 generate_change(){
@@ -15,30 +15,39 @@ generate_change(){
   (cd "$DIR" && \
   echo -n "change" >> README.md && \
   git commit -am "updating" && \
-  git tag -a "$VERSION" -m "$VERSION" )
+  git tag -a "$VERSION" -m "$VERSION" ) > /dev/null
 }
 
-# testGetLatestVersion(){
-#   EXPECTED_VERSION="0.3.4"
-#   # Setup
-#   cd $(mktemp -d)
-#   DIR=$(pwd)
+generate_breaking_change(){
+  DIR="$1"
+  VERSION="$2"
+  (cd "$DIR" && \
+  echo -n "change" >> README.md && \
+  git commit -am "break/something" && \
+  git tag -a "$VERSION" -m "$VERSION" ) > /dev/null
+}
 
-#   generate_base_project > /dev/null
-#   generate_change "$DIR" "$EXPECTED_VERSION" > /dev/null
+testGetLatestVersion(){
+  EXPECTED_VERSION="0.3.4"
+  # Setup
+  cd $(mktemp -d)
+  DIR=$(pwd)
 
-#   assertEquals "$EXPECTED_VERSION" "$(getLatestVersion $DIR)"
-# }
+  generate_base_project 
+  generate_change "$DIR" "$EXPECTED_VERSION" 
 
-# testGetInitialVersionIfNoTagsExist(){
-#   EXPECTED_VERSION="0.1.0"
+  assertEquals "$EXPECTED_VERSION" "$(getLatestVersion $DIR)"
+}
 
-#   cd $(mktemp -d)
-#   generate_base_project > /dev/null
+testGetInitialVersionIfNoTagsExist(){
+  EXPECTED_VERSION="0.1.0"
 
-#   DIR=$(pwd)
-#   assertEquals "$EXPECTED_VERSION" "$(getLatestVersion $DIR)"
-# }
+  cd $(mktemp -d)
+  generate_base_project > /dev/null
+
+  DIR=$(pwd)
+  assertEquals "$EXPECTED_VERSION" "$(getLatestVersion $DIR)"
+}
 
 # testIncrementMajorWithBreakingChange(){
 #   EXISTING_VERSIONS="0.1.0"
@@ -52,33 +61,35 @@ generate_change(){
 #   assertEquals "$EXPECTED_VERSION" "$(getLatestVersion $DIR)"
 # }
 
-# testIncrementMajor(){
-#   EXISTING_VERSION="0.1.0"
-#   EXPECTED_VERSION="1.0.0"
-#   
-#   assertEquals "$EXPECTED_VERSION" $(incrementMajor $EXISTING_VERSION) 
-# }
+testIncrementMajor(){
+  EXISTING_VERSION="0.1.0"
+  EXPECTED_VERSION="1.0.0"
+  
+  assertEquals "$EXPECTED_VERSION" $(incrementMajor $EXISTING_VERSION) 
+}
 
 testHasBreakingChanges(){
-  generate_base_project > /dev/null
+  generate_base_project
 
-  generate_change "$DIR" "0.1.0"  > /dev/null
+  generate_breaking_change "$DIR" "0.2.0" 
    
   DIR=$(pwd)
 
-  assertTrue "BANG" "$(hasBreakingChanges "$DIR")"
+  if ! hasBreakingChanges "$DIR"; then
+    fail
+  fi
 }
 
-# testGetLastVersion(){
-#   cd $(mktemp -d)
-#   DIR=$(pwd)
+testGetLastVersion(){
+  cd $(mktemp -d)
+  DIR=$(pwd)
 
-#   generate_base_project > /dev/null
-#   generate_change "$DIR" "0.1.0" 
-#   generate_change "$DIR" "0.2.0"
+  generate_base_project
+  generate_change "$DIR" "0.1.0" 
+  generate_change "$DIR" "0.2.0"
 
-#   assertEquals "0.2.0" "$(getLastVersion "$DIR")"
-# }
+  assertEquals "0.2.0" "$(getLastVersion "$DIR")"
+}
 
 oneTimeSetUp() {
   # Load include to test.
