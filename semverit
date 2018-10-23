@@ -1,5 +1,40 @@
 #! /bin/sh
 
+incrementMajor(){
+  VERSION="$1"
+  MAJOR=$(echo "$VERSION" | cut -d. -f1)
+  printf "%s.0.0" "$((MAJOR+1))"
+}
+
+hasBreakingChanges(){
+  DIR="$1"
+  cd "$DIR" || return
+  if git log | grep -q "break/"; then
+    echo "YES"
+    return 0
+  else
+    echo "NO"
+    return 1
+  fi
+}
+
+getLastVersion(){
+  DIR="$1"
+  cd "$DIR" || return
+  git describe --abbrev=0 2>/dev/null
+}
+
 getLatestVersion() {
-  cd "$1" && git describe --abbrev=0
+  DIR="$1"
+  VERSION=$(getLastVersion "$DIR")
+  if [ "$VERSION" = "" ]; then
+    echo "0.1.0"
+  else
+    if hasBreakingChanges "$DIR"; then
+      echo "YEP!!"
+      incrementMajor "$VERSION"
+    else
+      echo "$VERSION"
+    fi
+  fi
 }

@@ -1,19 +1,84 @@
 #! /bin/sh
 # file: semverit_test.sh
 
-testGetLatestVersion(){
-  EXPECTED_VERSION="0.3.4"
-  # Setup
-  cd $(mktemp -d)
+generate_base_project(){
   git init
-  echo "# semverit" >> README.md
+  echo "change" >> README.md
   git init
   git add README.md
   git commit -m "first commit"
-  git tag -a "$EXPECTED_VERSION" -m "$EXPECTED_VERSION"
-  DIR=$(pwd)
-  assertEquals "$EXPECTED_VERSION" "$(getLatestVersion $DIR)"
 }
+
+generate_change(){
+  DIR="$1"
+  VERSION="$2"
+  (cd "$DIR" && \
+  echo -n "change" >> README.md && \
+  git commit -am "updating" && \
+  git tag -a "$VERSION" -m "$VERSION" )
+}
+
+# testGetLatestVersion(){
+#   EXPECTED_VERSION="0.3.4"
+#   # Setup
+#   cd $(mktemp -d)
+#   DIR=$(pwd)
+
+#   generate_base_project > /dev/null
+#   generate_change "$DIR" "$EXPECTED_VERSION" > /dev/null
+
+#   assertEquals "$EXPECTED_VERSION" "$(getLatestVersion $DIR)"
+# }
+
+# testGetInitialVersionIfNoTagsExist(){
+#   EXPECTED_VERSION="0.1.0"
+
+#   cd $(mktemp -d)
+#   generate_base_project > /dev/null
+
+#   DIR=$(pwd)
+#   assertEquals "$EXPECTED_VERSION" "$(getLatestVersion $DIR)"
+# }
+
+# testIncrementMajorWithBreakingChange(){
+#   EXISTING_VERSIONS="0.1.0"
+#   EXPECTED_VERSION="1.0.0"
+#   cd $(mktemp -d)
+#   generate_base_project > /dev/null
+#   echo -n "change" >> README.md
+#   git commit -am "break/something bla bla bla" > /dev/null
+#   
+#   DIR=$(pwd)
+#   assertEquals "$EXPECTED_VERSION" "$(getLatestVersion $DIR)"
+# }
+
+# testIncrementMajor(){
+#   EXISTING_VERSION="0.1.0"
+#   EXPECTED_VERSION="1.0.0"
+#   
+#   assertEquals "$EXPECTED_VERSION" $(incrementMajor $EXISTING_VERSION) 
+# }
+
+testHasBreakingChanges(){
+  generate_base_project > /dev/null
+  echo -n "change" >> README.md
+  git commit -am "break/something bla bla bla"
+   
+  DIR=$(pwd)
+  hasBreakingChanges "$DIR"
+  assertTrue "$(hasBreakingChanges "$DIR")"
+}
+
+# testGetLastVersion(){
+#   cd $(mktemp -d)
+#   DIR=$(pwd)
+
+#   generate_base_project > /dev/null
+#   generate_change "$DIR" "0.1.0" 
+#   generate_change "$DIR" "0.2.0"
+
+#   assertEquals "0.2.0" "$(getLastVersion "$DIR")"
+# }
 
 oneTimeSetUp() {
   # Load include to test.
@@ -22,4 +87,3 @@ oneTimeSetUp() {
 
 # Load and run shUnit2.
 . ./shunit2-2.1.7/shunit2
-
