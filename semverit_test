@@ -37,7 +37,6 @@ generate_patch_change(){
   git commit -am "bugfix/something") > /dev/null
 }
 
-
 tag(){
   DIR="$1"
   VERSION="$2"
@@ -151,6 +150,34 @@ testMajorWithFeatureAndPatchIncrmentsMajorAndResetsMinorAndPatch(){
   generate_feature_change "$DIR"
   generate_patch_change "$DIR"
   
+  assertEquals "$EXPECTED_VERSION" "$(getNextVersion $DIR)"
+}
+
+testMajorResetMeta(){
+  EXISTING_VERSIONS="3.1.0-boom"
+  EXPECTED_VERSION="4.0.0"
+  cd $(mktemp -d)
+  DIR=$(pwd)
+
+  generate_base_project
+  generate_feature_change "$DIR"
+  tag "$DIR" "$EXISTING_VERSIONS"
+  generate_breaking_change "$DIR"
+
+  assertEquals "$EXPECTED_VERSION" "$(getNextVersion $DIR)"
+}
+
+testMinorResetMeta(){
+  EXISTING_VERSIONS="3.1.0-boom"
+  EXPECTED_VERSION="3.2.0"
+  cd $(mktemp -d)
+  DIR=$(pwd)
+
+  generate_base_project
+  generate_feature_change "$DIR"
+  tag "$DIR" "$EXISTING_VERSIONS"
+  generate_feature_change "$DIR"
+
   assertEquals "$EXPECTED_VERSION" "$(getNextVersion $DIR)"
 }
 

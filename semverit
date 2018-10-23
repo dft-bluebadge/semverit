@@ -10,7 +10,7 @@ incrementMinor(){
   VERSION="$1"
   MAJOR=$(echo "$VERSION" | cut -d. -f1)
   MINOR=$(echo "$VERSION" | cut -d. -f2)
-  PATCH=$(echo "$VERSION" | cut -d. -f3)
+  PATCH=$(echo "$VERSION" | cut -d. -f3 | cut -d- -f1)
   printf "%s.%s.%s" "$MAJOR" "$((MINOR+1))" "$PATCH"
 }
 
