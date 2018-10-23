@@ -18,7 +18,7 @@ incrementPatch(){
   VERSION="$1"
   MAJOR=$(echo "$VERSION" | cut -d. -f1)
   MINOR=$(echo "$VERSION" | cut -d. -f2)
-  PATCH=$(echo "$VERSION" | cut -d. -f3)
+  PATCH=$(echo "$VERSION" | cut -d. -f3 | cut -d- -f1)
   printf "%s.%s.%s" "$MAJOR" "$MINOR" "$((PATCH+1))"
 }
 
@@ -29,7 +29,7 @@ hasChange(){
   cd "$DIR" || return
   if git log --oneline "$VERSION..HEAD" | grep -q "^[a-z0-9]*\\s$TYPE/"; then
     return 0
-  fi
+  fi 
   return 1
 }
 
@@ -53,7 +53,6 @@ hasPatchChanges(){
   fi
   return 1
 }
-
 
 getLastVersion(){
   DIR="$1"
