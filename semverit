@@ -6,11 +6,28 @@ incrementMajor(){
   printf "%s.0.0" "$((MAJOR+1))"
 }
 
+incrementMinor(){
+  VERSION="$1"
+  MAJOR=$(echo "$VERSION" | cut -d. -f1)
+  MINOR=$(echo "$VERSION" | cut -d. -f2)
+  PATCH=$(echo "$VERSION" | cut -d. -f3)
+  printf "%s.%s.%s" "$MAJOR" "$((MINOR+1))" "$PATCH"
+}
+
 hasBreakingChanges(){
   DIR="$1"
   VERSION="$2"
   cd "$DIR" || return
   if git log --oneline "$VERSION..HEAD" | grep -q "^[a-z0-9]*\\sbreak/"; then
+    return 0
+  fi
+  return 1
+}
+
+hasFeatureChanges(){
+  VERSION="$2"
+  cd "$DIR" || return
+  if git log --oneline "$VERSION..HEAD" | grep -q "^[a-z0-9]*\\sfeature/"; then
     return 0
   fi
   return 1
@@ -31,5 +48,10 @@ getNextVersion() {
     if hasBreakingChanges "$DIR" "$(getLastVersion "$DIR")"; then
       incrementMajor "$VERSION"
     fi
+
+    if hasFeatureChanges "$DIR"  "$(getLastVersion "$DIR")"; then
+      incrementMinor "$VERSION"
+    fi
+
   fi
 }

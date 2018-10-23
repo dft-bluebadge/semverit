@@ -23,6 +23,14 @@ generate_breaking_change(){
   git commit -am "break/something") > /dev/null
 }
 
+generate_feature_change(){
+  DIR="$1"
+  (cd "$DIR" && \
+  echo -n "change" >> README.md && \
+  git commit -am "feature/something") > /dev/null
+}
+
+
 tag(){
   DIR="$1"
   VERSION="$2"
@@ -30,7 +38,7 @@ tag(){
     git tag -a "$VERSION" -m "$VERSION" > /dev/null)
 }
 
-testGetNextVersion(){
+testGetNextVersionReturnsEmpty(){
   # Setup
   cd $(mktemp -d)
   DIR=$(pwd)
@@ -39,7 +47,7 @@ testGetNextVersion(){
   generate_change "$DIR" "$EXPECTED_VERSION" 
   tag "$DIR" "0.1.0"
 
-  assertEquals "$EXPECTED_VERSION" "$(getNextVersion $DIR)"
+  assertEquals "" "$(getNextVersion $DIR)"
 }
 
 testGetInitialVersionIfNoTagsExist(){
@@ -60,8 +68,22 @@ testIncrementMajorWithBreakingChange(){
 
   generate_base_project
   generate_breaking_change "$DIR"
-  tag "$DIR" "0.2.0"
+  tag "$DIR" "0.1.0"
   generate_breaking_change "$DIR"
+  
+  assertEquals "$EXPECTED_VERSION" "$(getNextVersion $DIR)"
+}
+
+testIncrementingMinorWithFeature(){
+  EXISTING_VERSIONS="0.1.0"
+  EXPECTED_VERSION="0.2.0"
+  cd $(mktemp -d)
+  DIR=$(pwd)
+
+  generate_base_project
+  generate_feature_change "$DIR"
+  tag "$DIR" "0.1.0"
+  generate_feature_change "$DIR"
   
   assertEquals "$EXPECTED_VERSION" "$(getNextVersion $DIR)"
 }
@@ -73,14 +95,25 @@ testIncrementMajor(){
   assertEquals "$EXPECTED_VERSION" $(incrementMajor $EXISTING_VERSION) 
 }
 
+testIncrementMinor(){
+  EXISTING_VERSION="0.1.0"
+  EXPECTED_VERSION="0.2.0"
+  
+  assertEquals "$EXPECTED_VERSION" $(incrementMinor $EXISTING_VERSION) 
+}
+
 testHasBreakingChanges(){
+  cd $(mktemp -d)
+  DIR=$(pwd)
   generate_base_project
 
-  generate_breaking_change "$DIR" "0.2.0" 
+  generate_breaking_change "$DIR" 
+  tag "$DIR" "0.1.0" 
+  generate_breaking_change "$DIR" 
    
   DIR=$(pwd)
 
-  if ! hasBreakingChanges "$DIR" "0.2.0"; then
+  if ! hasBreakingChanges "$DIR" "0.1.0"; then
     fail
   fi
 }
