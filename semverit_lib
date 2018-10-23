@@ -27,7 +27,7 @@ hasChange(){
   DIR="$2"
   VERSION="$3"
   cd "$DIR" || return
-  if git log --oneline "$VERSION..HEAD" | grep -q "^[a-z0-9]*\\s$TYPE/"; then
+  if git log --oneline "$VERSION..HEAD" | grep -q "^[a-z0-9]*.*$TYPE/"; then
     return 0
   fi 
   return 1
