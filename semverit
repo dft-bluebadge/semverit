@@ -10,9 +10,9 @@ hasBreakingChanges(){
   DIR="$1"
   cd "$DIR" || return
   if git log | grep -q "break/"; then
-    return 1
+    echo 0
   else
-    return 1
+    echo 1
   fi
 }
 
