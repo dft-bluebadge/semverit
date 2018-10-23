@@ -19,15 +19,22 @@ generate_change(){
 generate_breaking_change(){
   DIR="$1"
   (cd "$DIR" && \
-  echo -n "change" >> README.md && \
+  echo "breaking change" >> README.md && \
   git commit -am "break/something") > /dev/null
 }
 
 generate_feature_change(){
   DIR="$1"
   (cd "$DIR" && \
-  echo -n "change" >> README.md && \
+  echo "feature" >> README.md && \
   git commit -am "feature/something") > /dev/null
+}
+
+generate_patch_change(){
+  DIR="$1"
+  (cd "$DIR" && \
+  echo "patch" >> README.md && \
+  git commit -am "bugfix/something") > /dev/null
 }
 
 
@@ -102,6 +109,24 @@ testIncrementMinorWithFeatureMaintainsMajor(){
   assertEquals "$EXPECTED_VERSION" "$(getNextVersion $DIR)"
 }
 
+testIncrementPatchWithBugfix(){
+  EXISTING_VERSIONS="0.1.0"
+  EXPECTED_VERSION="0.1.1"
+  cd $(mktemp -d)
+  DIR=$(pwd)
+
+  generate_base_project
+  generate_patch_change "$DIR"
+  tag "$DIR" "$EXISTING_VERSIONS"
+  generate_patch_change "$DIR"
+  
+  assertEquals "$EXPECTED_VERSION" "$(getNextVersion $DIR)"
+}
+
+testFeatureWithPathIncrementsMinorAndResetsPatch(){
+  echo "TODO"  
+}
+
 testIncrementMajor(){
   EXISTING_VERSION="0.1.0"
   EXPECTED_VERSION="1.0.0"
@@ -114,6 +139,13 @@ testIncrementMinor(){
   EXPECTED_VERSION="0.2.0"
   
   assertEquals "$EXPECTED_VERSION" $(incrementMinor $EXISTING_VERSION) 
+}
+
+testIncrementPatch(){
+  EXISTING_VERSION="0.1.0"
+  EXPECTED_VERSION="0.1.1"
+  
+  assertEquals "$EXPECTED_VERSION" $(incrementPatch $EXISTING_VERSION) 
 }
 
 testHasBreakingChanges(){
