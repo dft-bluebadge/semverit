@@ -65,7 +65,7 @@ testHasBreakingChanges(){
   git commit -am "break/something bla bla bla"
    
   DIR=$(pwd)
-  hasBreakingChanges "$DIR"
+
   assertTrue "BANG" "$(hasBreakingChanges "$DIR")"
 }
 
