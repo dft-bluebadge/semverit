@@ -61,8 +61,8 @@ generate_change(){
 
 testHasBreakingChanges(){
   generate_base_project > /dev/null
-  echo -n "change" >> README.md
-  git commit -am "break/something bla bla bla"
+
+  generate_change "$DIR" "0.1.0"  > /dev/null
    
   DIR=$(pwd)
 
