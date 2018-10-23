@@ -1,0 +1,25 @@
+#! /bin/sh
+# file: semverit_test.sh
+
+testGetLatestVersion(){
+  EXPECTED_VERSION="0.3.4"
+  # Setup
+  cd $(mktemp -d)
+  git init
+  echo "# semverit" >> README.md
+  git init
+  git add README.md
+  git commit -m "first commit"
+  git tag -a "$EXPECTED_VERSION" -m "$EXPECTED_VERSION"
+  DIR=$(pwd)
+  assertEquals "$EXPECTED_VERSION" "$(getLatestVersion $DIR)"
+}
+
+oneTimeSetUp() {
+  # Load include to test.
+  . ./semverit
+}
+
+# Load and run shUnit2.
+. ./shunit2-2.1.7/shunit2
+
