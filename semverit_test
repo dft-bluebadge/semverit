@@ -247,7 +247,7 @@ testGetLastVersion(){
 
 oneTimeSetUp() {
   # Load include to test.
-  . ./semverit
+  . ./semverit_lib
 }
 
 # Load and run shUnit2.
