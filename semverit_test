@@ -80,7 +80,7 @@ testIncrementPatchWithBugfix(){
 }
 
 testFeatureWithPathIncrementsMinorAndResetsPatch(){
-  EXISTING_VERSIONS="3.1.0"
+  EXISTING_VERSIONS="3.1.1"
   EXPECTED_VERSION="3.2.0"
   cd $(mktemp -d)
   DIR=$(pwd)
