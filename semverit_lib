@@ -2,8 +2,11 @@
 
 incrementMajor(){
   VERSION="$1"
-  MAJOR=$(echo "$VERSION" | cut -d. -f1)
-  printf "%s.0.0" "$((MAJOR+1))"
+  MAJOR=$(echo "$VERSION" | tr -d 'v' | cut -d. -f1)
+  if echo "$VERSION" | grep -q "^v"; then
+    PREFIX="v"
+  fi
+  printf "%s%s.0.0" "$PREFIX" "$((MAJOR+1))"
 }
 
 incrementMinor(){

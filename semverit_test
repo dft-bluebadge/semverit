@@ -1,48 +1,5 @@
 #! /bin/sh
-# file: semverit_test.sh
-
-generate_base_project(){
-  git init > /dev/null
-  echo "change" >> README.md
-  git init > /dev/null
-  git add README.md > /dev/null
-  git commit -m "first commit" > /dev/null
-}
-
-generate_change(){
-  DIR="$1"
-  (cd "$DIR" && \
-  echo -n "change" >> README.md && \
-  git commit -am "updating") > /dev/null
-}
-
-generate_breaking_change(){
-  DIR="$1"
-  (cd "$DIR" && \
-  echo "breaking change" >> README.md && \
-  git commit -am "break/something") > /dev/null
-}
-
-generate_feature_change(){
-  DIR="$1"
-  (cd "$DIR" && \
-  echo "feature" >> README.md && \
-  git commit -am "feature/something") > /dev/null
-}
-
-generate_patch_change(){
-  DIR="$1"
-  (cd "$DIR" && \
-  echo "patch" >> README.md && \
-  git commit -am "bugfix/something") > /dev/null
-}
-
-tag(){
-  DIR="$1"
-  VERSION="$2"
-  (cd "$DIR" && \
-    git tag -a "$VERSION" -m "$VERSION" > /dev/null)
-}
+# file: semverit_test
 
 testGetNextVersionReturnsEmpty(){
   # Setup
@@ -202,6 +159,14 @@ testIncrementMajor(){
   assertEquals "$EXPECTED_VERSION" $(incrementMajor $EXISTING_VERSION) 
 }
 
+testIncrementMajorWithPrefixV(){
+  EXISTING_VERSION="v0.1.0"
+  EXPECTED_VERSION="v1.0.0"
+  
+  assertEquals "$EXPECTED_VERSION" $(incrementMajor $EXISTING_VERSION) 
+}
+
+
 testIncrementMinor(){
   EXISTING_VERSION="0.1.0"
   EXPECTED_VERSION="0.2.0"
@@ -247,6 +212,7 @@ testGetLastVersion(){
 
 oneTimeSetUp() {
   # Load include to test.
+  . ./semverit_test_lib
   . ./semverit_lib
 }
 
