@@ -6,7 +6,7 @@ incrementMajor(){
   if echo "$VERSION" | grep -q "^v"; then
     PREFIX="v"
   fi
-  printf "%s%s.0.0" "$PREFIX" "$((MAJOR+1))"
+  printf "%s%s.0.0\\n" "$PREFIX" "$((MAJOR+1))"
 }
 
 incrementMinor(){
@@ -14,7 +14,7 @@ incrementMinor(){
   MAJOR=$(echo "$VERSION" | cut -d. -f1)
   MINOR=$(echo "$VERSION" | cut -d. -f2)
   PATCH=$(echo "$VERSION" | cut -d. -f3 | cut -d- -f1)
-  printf "%s.%s.%s" "$MAJOR" "$((MINOR+1))" "$PATCH"
+  printf "%s.%s.%s\\n" "$MAJOR" "$((MINOR+1))" "$PATCH"
 }
 
 incrementPatch(){
@@ -22,7 +22,7 @@ incrementPatch(){
   MAJOR=$(echo "$VERSION" | cut -d. -f1)
   MINOR=$(echo "$VERSION" | cut -d. -f2)
   PATCH=$(echo "$VERSION" | cut -d. -f3 | cut -d- -f1)
-  printf "%s.%s.%s" "$MAJOR" "$MINOR" "$((PATCH+1))"
+  printf "%s.%s.%s\\n" "$MAJOR" "$MINOR" "$((PATCH+1))"
 }
 
 hasChange(){
@@ -83,6 +83,6 @@ getNextVersion() {
       incrementPatch "$VERSION"
       exit 0
     fi
-
+    
   fi
 }
