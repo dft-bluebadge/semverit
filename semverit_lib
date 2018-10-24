@@ -83,6 +83,7 @@ getNextVersion() {
       incrementPatch "$VERSION"
       exit 0
     fi
-    
+   
+    echo "$VERSION" 
   fi
 }

@@ -10,7 +10,7 @@ testGetNextVersionReturnsEmpty(){
   generate_change "$DIR" "$EXPECTED_VERSION" 
   tag "$DIR" "0.1.0"
 
-  assertEquals "" "$(getNextVersion $DIR)"
+  assertEquals "0.1.0" "$(getNextVersion $DIR)"
 }
 
 testGetInitialVersionIfNoTagsExist(){
