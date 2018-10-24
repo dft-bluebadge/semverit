@@ -18,3 +18,11 @@ shellcheck-v0.5.0/:
 .PHONY: shell_check_osx
 shell_check_osx:
 	brew install shellcheck
+
+
+.PHONY: dist
+dist:
+	mkdir -p dist
+	cp semverit_lib dist/semverit
+	echo 'getNextVersion "$$1"' >> dist/semverit
+	chmod +x dist/semverit

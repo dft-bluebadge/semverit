@@ -1,5 +1,0 @@
-#! /bin/sh
-
-. ./semverit_lib
-
-getNextVersion "$1"
