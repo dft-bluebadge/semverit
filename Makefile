@@ -1,11 +1,11 @@
 .PHONY: test
 test: shunit2-2.1.7/ shellcheck-v0.5.0/
-	./shellcheck-v0.5.0/shellcheck -x semverit
+	./shellcheck-v0.5.0/shellcheck -x semverit_lib
 	./semverit_test
 
 .PHONY: test_osx
 test_osx: shunit2-2.1.7/ shell_check_osx
-	shellcheck -x semverit
+	shellcheck -x semverit_lib
 	./semverit_test
 
 shunit2-2.1.7/:
