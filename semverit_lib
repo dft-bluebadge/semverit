@@ -59,7 +59,7 @@ hasPatchChanges(){
 getLastVersion(){
   DIR="$1"
   cd "$DIR" || return
-  git describe --exclude "*rc*" --abbrev=0 2>/dev/null
+  git tag | grep -v rc | grep -v release | sort -V | tail -n1
 }
 
 getNextVersion() {
