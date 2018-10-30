@@ -10,7 +10,7 @@ testGetNextVersionReturnsEmpty(){
   generate_change "$DIR" "$EXPECTED_VERSION" 
   tag "$DIR" "0.1.0"
 
-  assertEquals "0.1.0" "$(getNextVersion $DIR)"
+  assertEquals "0.1.0,none" "$(getNextVersion $DIR)"
 }
 
 testGetInitialVersionIfNoTagsExist(){
@@ -20,7 +20,7 @@ testGetInitialVersionIfNoTagsExist(){
   generate_base_project
 
   DIR=$(pwd)
-  assertEquals "$EXPECTED_VERSION" "$(getNextVersion $DIR)"
+  assertEquals "$EXPECTED_VERSION,minor" "$(getNextVersion $DIR)"
 }
 
 testIncrementMajorWithBreakingChange(){
@@ -34,7 +34,7 @@ testIncrementMajorWithBreakingChange(){
   tag "$DIR" "0.1.0"
   generate_breaking_change "$DIR"
   
-  assertEquals "$EXPECTED_VERSION" "$(getNextVersion $DIR)"
+  assertEquals "$EXPECTED_VERSION,major" "$(getNextVersion $DIR)"
 }
 
 testIncrementingMinorWithFeature(){
@@ -48,7 +48,7 @@ testIncrementingMinorWithFeature(){
   tag "$DIR" "$EXISTING_VERSIONS"
   generate_feature_change "$DIR"
   
-  assertEquals "$EXPECTED_VERSION" "$(getNextVersion $DIR)"
+  assertEquals "$EXPECTED_VERSION,minor" "$(getNextVersion $DIR)"
 }
 
 testIncrementMinorWithFeatureMaintainsMajor(){
@@ -62,7 +62,7 @@ testIncrementMinorWithFeatureMaintainsMajor(){
   tag "$DIR" "$EXISTING_VERSIONS"
   generate_feature_change "$DIR"
   
-  assertEquals "$EXPECTED_VERSION" "$(getNextVersion $DIR)"
+  assertEquals "$EXPECTED_VERSION,minor" "$(getNextVersion $DIR)"
 }
 
 testIncrementPatchWithBugfix(){
@@ -76,10 +76,10 @@ testIncrementPatchWithBugfix(){
   tag "$DIR" "$EXISTING_VERSIONS"
   generate_patch_change "$DIR"
   
-  assertEquals "$EXPECTED_VERSION" "$(getNextVersion $DIR)"
+  assertEquals "$EXPECTED_VERSION,patch" "$(getNextVersion $DIR)"
 }
 
-testFeatureWithPathIncrementsMinorAndResetsPatch(){
+testFeatureWithPatchIncrementsMinorAndResetsPatch(){
   EXISTING_VERSIONS="3.1.1"
   EXPECTED_VERSION="3.2.0"
   cd $(mktemp -d)
@@ -91,7 +91,7 @@ testFeatureWithPathIncrementsMinorAndResetsPatch(){
   generate_feature_change "$DIR"
   generate_patch_change "$DIR"
   
-  assertEquals "$EXPECTED_VERSION" "$(getNextVersion $DIR)"
+  assertEquals "$EXPECTED_VERSION,minor" "$(getNextVersion $DIR)"
 }
 
 testMajorWithFeatureAndPatchIncrmentsMajorAndResetsMinorAndPatch(){
@@ -107,7 +107,7 @@ testMajorWithFeatureAndPatchIncrmentsMajorAndResetsMinorAndPatch(){
   generate_feature_change "$DIR"
   generate_patch_change "$DIR"
   
-  assertEquals "$EXPECTED_VERSION" "$(getNextVersion $DIR)"
+  assertEquals "$EXPECTED_VERSION,major" "$(getNextVersion $DIR)"
 }
 
 testMajorResetMeta(){
@@ -121,7 +121,7 @@ testMajorResetMeta(){
   tag "$DIR" "$EXISTING_VERSIONS"
   generate_breaking_change "$DIR"
 
-  assertEquals "$EXPECTED_VERSION" "$(getNextVersion $DIR)"
+  assertEquals "$EXPECTED_VERSION,major" "$(getNextVersion $DIR)"
 }
 
 testMinorResetMeta(){
@@ -135,7 +135,7 @@ testMinorResetMeta(){
   tag "$DIR" "$EXISTING_VERSIONS"
   generate_feature_change "$DIR"
 
-  assertEquals "$EXPECTED_VERSION" "$(getNextVersion $DIR)"
+  assertEquals "$EXPECTED_VERSION,minor" "$(getNextVersion $DIR)"
 }
 
 testPatchResetMeta(){
@@ -149,21 +149,21 @@ testPatchResetMeta(){
   tag "$DIR" "$EXISTING_VERSIONS"
   generate_patch_change "$DIR"
 
-  assertEquals "$EXPECTED_VERSION" "$(getNextVersion $DIR)"
+  assertEquals "$EXPECTED_VERSION,patch" "$(getNextVersion $DIR)"
 }
 
 testIncrementMajor(){
   EXISTING_VERSION="0.1.0"
   EXPECTED_VERSION="1.0.0"
   
-  assertEquals "$EXPECTED_VERSION" $(incrementMajor $EXISTING_VERSION) 
+  assertEquals "$EXPECTED_VERSION,major" $(incrementMajor $EXISTING_VERSION) 
 }
 
 testIncrementMajorWithPrefixV(){
   EXISTING_VERSION="v0.1.0"
   EXPECTED_VERSION="v1.0.0"
   
-  assertEquals "$EXPECTED_VERSION" $(incrementMajor $EXISTING_VERSION) 
+  assertEquals "$EXPECTED_VERSION,major" $(incrementMajor $EXISTING_VERSION) 
 }
 
 
@@ -171,14 +171,14 @@ testIncrementMinor(){
   EXISTING_VERSION="0.1.0"
   EXPECTED_VERSION="0.2.0"
   
-  assertEquals "$EXPECTED_VERSION" $(incrementMinor $EXISTING_VERSION) 
+  assertEquals "$EXPECTED_VERSION,minor" $(incrementMinor $EXISTING_VERSION) 
 }
 
 testIncrementPatch(){
   EXISTING_VERSION="0.1.0"
   EXPECTED_VERSION="0.1.1"
   
-  assertEquals "$EXPECTED_VERSION" $(incrementPatch $EXISTING_VERSION) 
+  assertEquals "$EXPECTED_VERSION,patch" $(incrementPatch $EXISTING_VERSION) 
 }
 
 testHasBreakingChanges(){
