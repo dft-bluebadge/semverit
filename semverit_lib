@@ -59,7 +59,8 @@ hasPatchChanges(){
 getLastVersion(){
   DIR="$1"
   cd "$DIR" || return
-  git tag | grep -v release | sort -V | tail -n1
+  # shellcheck disable=SC1117
+  git tag | grep -v release | sed -r "s/([0-9]+\.[0-9]+\.[0-9]+$)/\1\.99999/"|sort -V|sed s/\.99999$// | tail -n1
 }
 
 getNextVersion() {
