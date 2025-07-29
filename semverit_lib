@@ -31,7 +31,9 @@ hasChange(){
   cd "$DIR" || return
   if git log --oneline "$VERSION..HEAD" | grep -q "^[a-z0-9]*.*$TYPE/"; then
     return 0
-  fi 
+  elif git log --oneline "$VERSION..HEAD" | grep "^[a-z0-9]*.*$TYPE" | grep -q -v "/dev/"; then
+    return 0
+  fi
   return 1
 }
 
@@ -51,6 +53,13 @@ hasFeatureChanges(){
 
 hasPatchChanges(){
   if hasChange "bugfix" "$1" "$2"; then
+    return 0
+  fi
+  return 1
+}
+
+hasAnyChanges(){
+  if hasChange "BBB" "$1" "$2"; then
     return 0
   fi
   return 1
@@ -85,7 +94,12 @@ getNextVersion() {
       incrementPatch "$VERSION"
       exit 0
     fi
-   
-    echo "$VERSION,none" 
+
+    if hasAnyChanges "$DIR"  "$(getLastVersion "$DIR")"; then
+      incrementMinor "$VERSION"
+      exit 0
+    fi
+
+    echo "$VERSION,none"
   fi
 }
